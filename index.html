@@ -24,8 +24,9 @@
 		
 	</head>
 	
-
+	<body >
 	<br>
+		
 		<div id="user_name" >
 			<h3 style="color: red; ">khalil mhajne</h3>
 		  </div>
@@ -43,6 +44,8 @@
 			</p>
 			
 		</div>
+
+		<div class="settings">
 		  <label class="font">Setting</label>
 		<p class="font" ><strong>Note:</strong> Type something in the text input box and press enter key.</p>   
 		<div>
@@ -77,6 +80,7 @@
 		
 		<button onclick="myFunction()" class="button">Click me to insert random values</button>
 		<button onclick="Start()" class="button" >Start</button>
+		</div>
 		<button id="playagain" onclick="setting()" class="button" style="display: none;">Play again</button>
 		
 		<div id="game" >
@@ -107,7 +111,7 @@
 		var right = 39
 		var up = 38
 		var left = 37
-		//press key ...
+		//press key ... in Setting Page
     	$(document).on("keydown" , "input", function(e){
         	if(this.id == "down"){
 				down=e.keyCode

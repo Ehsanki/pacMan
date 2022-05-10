@@ -36,9 +36,10 @@ $(document).ready(function() {
 	context = canvas.getContext("2d");
 });
 
-function Start() {
+function Start() { //Done
 	Get_input_values();
 	if(!ok){
+		ok=true
 		return;
 	}
 	clean_the_screan();
@@ -49,76 +50,52 @@ function Start() {
 		"keydown",
 		function(e) {
 			keysDown[e.keyCode] = true;
-		},
-		false
+		}
+		
 	);
 	addEventListener(
 		"keyup",
 		function(e) {
 			keysDown[e.keyCode] = false;
-		},
-		false
+		}
 	);
 	interval = setInterval(update, 200)
 }
 
 var ok = true
-function Get_input_values(){
+function Get_input_values(){ //***Done  */
 	food_remain = document.getElementById("balls").value
 	if(food_remain<50 || food_remain>90){
 		window.alert("the food must be between 50 and 90 (including)")
 		ok =false
 	}
+
 	time = document.getElementById("time").value
-	if(time<60){
+	if(time<2){
 		window.alert("the time must be greater than 59 secound")
 		ok=false
 	}
+	
 	monsters_counter = document.getElementById("monsters").value
 	if(monsters_counter < 1 && monsters_counter>4){
 		window.alert("the number of monsters must be between 1 and 4 (including)")
 		ok=false
 	}
+	
 }
 
-function clean_the_screan(){
+function clean_the_screan(){ //Done 
+	$( ".settings" ).css("display","none");
 	document.getElementsByTagName('body')[0].style.background = "#ffffff ";
-	document.getElementById("game").style.display = 'inline' ;//show the canvas
+	document.getElementById("game").style.display = 'block' ;//show the canvas
 	document.getElementById("Time").style.display = 'inline';//show the time
 	document.getElementById("score").style.display = 'inline';//show the score
-	document.getElementById("hl").style.display = 'block'
-	var x = document.getElementsByClassName("font"); //remove the settings
-	for (i in x){
-		if(i<9){
-			x[i].style.display='none' ;
-		}
-		else{
-			break
-		}	
-	}
-	var t = document.getElementsByClassName("input"); //remove the input fields
-	for (i in t){
-		if(i<8){
-			t[i].style.display='none' ;
-		}	
-		else
-		{
-			break
-		}
-	}
-	var buttons = document.getElementsByClassName("button"); //remove the buttons
-	for ( j in buttons){
-		if(j<2){
-			buttons[j].style.display='none' ;
-		}	
-		else
-		{
-			break
-		}
-	}
+	document.getElementById("hl").style.display = 'inline' // Remained
+	
+
 }
 
-function show_setting(){
+function show_setting(){ /**Done */
 	document.getElementById("game setting").style.display ="inline"
 	document.getElementById("U").style.display ="inline-block"
 	document.getElementById("D").style.display ="inline-block"
@@ -139,11 +116,11 @@ function show_setting(){
 	document.getElementById("hl").innerHTML = "Remained "+rejection + " attempts"
 }
 
-function create_the_board(){
+function create_the_board(){ //Done
 	board = new Array();
 	score = 0;
 	pac_color = "yellow";
-	var cnt = 100;
+	var cnt = 15*15; // return to 100
 	var pacman_remain = 1;
 	start_time = new Date();
 	//monsters[0] = monster ;
@@ -210,7 +187,7 @@ function create_the_board(){
 	board[time_plus[0]][time_plus[1]] = 7 //add time
 
 }
-function update (){
+function update (){ //Done
 	UpdatePosition_Pac();
 	update_dynamic_point();
 	for( i in monsters)
@@ -225,7 +202,7 @@ function update (){
 	show_setting();
 }
 
-function UpdatePosition_Pac() {
+function UpdatePosition_Pac() { //Done
 	board[shape.i][shape.j] = 0; //convert location of pacman to be 0 
 	t = GetKeyPressed();
 	if (t == 1) {
@@ -256,11 +233,11 @@ function UpdatePosition_Pac() {
 		rejection += 2 
 		get_health = true
 	}
+	
+	//Update Time
 	var currentTime = new Date();
 	time_elapsed = Math.floor((currentTime - start_time) / 1000);
-	if (score >= 20 && time_elapsed <= 10) {
-		pac_color = "green";
-	}
+
 	if(board[shape.i][shape.j] ==7){
 		time = parseInt(time) + 20 
 		get_clock = true
@@ -299,6 +276,8 @@ function UpdatePosition_Pac() {
 	}
 }
 function Play_again(){
+	//Done
+	rejection=5;
 	document.getElementById("game").style.display='none'
 	document.getElementById("game setting").style.display='none'
 	document.getElementById("playagain").style.display = 'block'
@@ -316,45 +295,18 @@ function Play_again(){
 	document.getElementById("B").style.display ='none'
 	document.getElementById("T").style.display ='none'
 	document.getElementById("M").style.display ='none'
-	document.getElementById("hl").style.display ='none'
+	// Try to delete hl id 
 
 }
 
-function setting(){
-	document.getElementById("playagain").style.display = 'none'
-	var x = document.getElementsByClassName("font"); //show the settings
-	for (i in x){
-		if(i<9){
-			x[i].style.display='block' ;
-		}
-		else{
-			break
-		}	
-	}
-	var t = document.getElementsByClassName("block"); //show the input fields
-	console.log(t)
-	for (i in t){
-		if(i<8){
-			console.log(t)
-			t[i].style.display='block' ;
-		}	
-		else
-		{
-			break
-		}
-	}
-	var buttons = document.getElementsByClassName("button"); //show the buttons
-	for ( j in buttons){
-		if(j<2){
-			buttons[j].style.display='block' ;
-		}	
-		else
-		{
-			break
-		}
-	}
+function setting(){ //done
+	$(".settings").css("display","block");
+	
+	$("#playagain").css("display","none");
+	$("#hl").css("display","none");
+	
 }
-function UpdatePosition_Monster( M){
+function UpdatePosition_Monster( M){ //Done
 	if(Math.abs(M.i/40 - shape.i)<1 && Math.abs(M.j/40 - shape.j)<1){//rejection between the pacman and the monster
 		score = Math.max(0,score-10)
 		M.i = 40 ;
@@ -427,7 +379,7 @@ function UpdatePosition_Monster( M){
 	}
 	
 }
-function update_dynamic_point(){ //update
+function update_dynamic_point(){ //Done update
 	if(!eat)
 	{
 		if(dynamic_p==null)
@@ -453,7 +405,7 @@ function update_dynamic_point(){ //update
 	}
 
 }
-function Drow(x) {
+function Drow(x) { //Done
 	canvas.width = canvas.width; //clean board
 	lblScore.value = score;
 	lblTime.value = time_elapsed;
@@ -510,6 +462,11 @@ function Drow(x) {
 				context.rect(center.x - 22.5, center.y - 22.5, 40, 40); //rectangle - obstacle
 				context.fillStyle = "grey"; //color
 				context.fill();
+				/**
+				var img = new Image();
+				img.src='./health.png';
+				context.drawImage(img,40*i,40*j,40,40);
+				*/
 
 			}
 			else if (board[i][j] == 6 && !get_health){
@@ -532,7 +489,7 @@ function Drow(x) {
 	}	
 }
 
-function Drow_monster_point(M){
+function Drow_monster_point(M){ //Done
 	var img = new Image();
 	img.src='./monster.png';
 	context.drawImage(img,M.i,M.j,40,40);
