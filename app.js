@@ -199,20 +199,31 @@ function create_the_board(){ //Done
 
 }
 function update (){ //Done
+	Update_time();
+	canvas.width = canvas.width; //clean board
 	UpdatePosition_Pac();
 	update_dynamic_point();
+	
 	for( i in monsters)
 	{
 		UpdatePosition_Monster(monsters[i]);
 	}
-	Drow(dir);
 	for( i in monsters)
 	{
 		Drow_monster_point(monsters[i]);
 	}
+	Drow(dir);
+	draw_dynamin_point();
+	
 	show_setting();
-}
+	game_status();
 
+}
+function Update_time(){
+	//Update Time
+	var currentTime = new Date();
+	time_elapsed = Math.floor((currentTime - start_time) / 1000);
+}
 function UpdatePosition_Pac() { //Done
 	board[shape.i][shape.j] = 0; //convert location of pacman to be 0 
 	t = GetKeyPressed();
@@ -250,49 +261,11 @@ function UpdatePosition_Pac() { //Done
 	}
 	if(board[shape.i][shape.j] ==6){
 		rejection += 2 
-		get_health = true
 	}
-	
-	//Update Time
-	var currentTime = new Date();
-	time_elapsed = Math.floor((currentTime - start_time) / 1000);
-
 	if(board[shape.i][shape.j] ==7){
 		time = parseInt(time) + 20 
-		get_clock = true
-		console.log(time)
 	}
 	board[shape.i][shape.j] = 2;
-	if(lblTime.value == time){
-		window.clearInterval(interval);
-		if(score<100){		
-			var str = " You arr better than " + score + " points!" 
-		}
-		else{
-			var str = " Winner!!!"
-		}
-		window.alert(str);
-		Play_again()
-	}
-	if(rejection==0){
-		window.clearInterval(interval);
-		window.alert("LOSER!");
-		Play_again()
-	}
-	
-	else {
-		 if(recent == null){
-			recent = 1 ;
-			Drow(0);
-		}
-		else if (t==1 || t==2 || t==3 || t==4 ){
-			Drow(t);
-		}
-		else{
-			//stay_on_location[i,j] - n key pressed
-		}
-		
-	}
 }
 function Play_again(){
 	//Done
@@ -317,7 +290,6 @@ function Play_again(){
 	// Try to delete hl id 
 
 }
-
 function setting(){ //done
 	$(".settings").css("display","block");
 	
@@ -327,7 +299,7 @@ function setting(){ //done
 }
 function UpdatePosition_Monster( M){ //Done
 	if(Math.abs(M.i/40 - shape.i)<1 && Math.abs(M.j/40 - shape.j)<1){//rejection between the pacman and the monster
-		score = Math.max(0,score-10)
+		score -=10
 		M.i = 40 ;
 		M.j = 40 ;
 		M.index = 0
@@ -424,8 +396,46 @@ function update_dynamic_point(){ //Done update
 	}
 
 }
+function game_status(){
+	if(lblTime.value == time){
+		window.clearInterval(interval);
+		if(score<100){		
+			var msg = " You arr better than " + score + " points!" 
+		}
+		else{
+			var msg = " Winner!!!"
+		}
+		window.alert(msg);
+		Play_again()
+	}
+	if( eaten == balls){
+		window.clearInterval(interval);
+		var msg = " Winner!!!"
+		window.alert(msg);
+		Play_again()
+	}
+	if(rejection<=0){
+		window.clearInterval(interval);
+		window.alert("LOSER!");
+		Play_again()
+	}
+	else {
+		 if(recent == null){
+			recent = 1 ;
+			Drow(0);
+		}
+		else if (t==1 || t==2 || t==3 || t==4 ){
+			Drow(t);
+		}
+		else{
+			//stay_on_location[i,j] - n key pressed
+		}
+		
+	}
+
+}
 function Drow(x) { //Done
-	canvas.width = canvas.width; //clean board
+	
 	lblScore.value = score;
 	lblTime.value = time_elapsed;
 	for (var i = 0; i < 15; i++) {
@@ -498,7 +508,7 @@ function Drow(x) { //Done
 				*/
 
 			}
-			else if (board[i][j] == 6 && !get_health){
+			else if (board[i][j] == 6 ){
 				var health = new Object()
 				health.i = i 
 				health.j = j
@@ -506,7 +516,7 @@ function Drow(x) { //Done
 				img.src='./health.png';
 				context.drawImage(img,40*i,40*j,40,40);
 			}
-			else if (board[i][j] == 7 && !get_clock){
+			else if (board[i][j] == 7 ){
 				var clock = new Object()
 				clock.i = i 
 				clock.j = j
@@ -514,22 +524,24 @@ function Drow(x) { //Done
 				img.src='./clock.png';
 				context.drawImage(img,40*i,40*j,40,40);
 			}
+			
 		}
 	}	
 }
-
 function Drow_monster_point(M){ //Done
 	var img = new Image();
 	img.src='./monster.png';
 	context.drawImage(img,M.i,M.j,40,40);
-
+	
+}
+function draw_dynamin_point(){
 	if(!eat){
+		console.log("dynamin")
 		context.beginPath();
 		context.fillStyle = 'rgba(2, 250, 72, 1)';
 		context.fillRect( dynamic_p.i*40, dynamic_p.j*40, 40, 40);
 	}
 }
-
 function legal_point(i,j){ //check if (i,j) is a correct point
 	if( 0 <=i && i <15 && 0<=j  && j<15){
 		return true;
@@ -538,7 +550,6 @@ function legal_point(i,j){ //check if (i,j) is a correct point
 		return false;
 	}
 }
-
 function neighbors( node ){ //return neighbors of node
 	var x = node.i ;
 	var y = node.j;
@@ -577,8 +588,6 @@ function neighbors( node ){ //return neighbors of node
 	}	
 	return arr 
 }
-
-
 function DFS (start , end ){ //return path from start to end 
 	stack = new Stack() ;
  	explored = new Set() ;
@@ -631,7 +640,6 @@ function DFS (start , end ){ //return path from start to end
 	}
 	return arr
 }
-
 function findRandomEmptyCell(board) { //find empty cell
 	var i = Math.floor(Math.random() * 9 + 1);
 	var j = Math.floor(Math.random() * 9 + 1);
@@ -641,7 +649,6 @@ function findRandomEmptyCell(board) { //find empty cell
 	}
 	return [i, j];
 }
-
 function GetKeyPressed() { //get the key pressed
 	if (keysDown[up]) {//up
 		return 1;
