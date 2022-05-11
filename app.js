@@ -30,13 +30,19 @@ var get_clock = false
 var neighbor
 var random
 var eaten = 0
+var song =new Audio('sound.mp3');
+var move_sound =new Audio('move.mp3');
 
 
 $(document).ready(function() {
 	context = canvas.getContext("2d");
 });
 
+
+
 function Start() { //Done
+
+	startMusic()
 	Get_input_values();
 	if(!ok){
 		ok=true
@@ -62,6 +68,12 @@ function Start() { //Done
 	interval = setInterval(update, 200)
 }
 
+function startMusic(){
+	song.loop = true
+	song.play()
+	
+}
+
 var ok = true
 function Get_input_values(){ //***Done  */
 	food_remain = document.getElementById("balls").value
@@ -69,7 +81,6 @@ function Get_input_values(){ //***Done  */
 		window.alert("the food must be between 50 and 90 (including)")
 		ok =false
 	}
-
 	time = document.getElementById("time").value
 	if(time<2){
 		window.alert("the time must be greater than 59 secound")
@@ -201,19 +212,20 @@ function create_the_board(){ //Done
 function update (){ //Done
 	Update_time();
 	canvas.width = canvas.width; //clean board
+
 	UpdatePosition_Pac();
 	update_dynamic_point();
-	
 	for( i in monsters)
 	{
 		UpdatePosition_Monster(monsters[i]);
 	}
+	Drow(dir);
 	for( i in monsters)
 	{
 		Drow_monster_point(monsters[i]);
+		draw_dynamic_point();
 	}
-	Drow(dir);
-	draw_dynamin_point();
+	
 	
 	show_setting();
 	game_status();
@@ -227,6 +239,9 @@ function Update_time(){
 function UpdatePosition_Pac() { //Done
 	board[shape.i][shape.j] = 0; //convert location of pacman to be 0 
 	t = GetKeyPressed();
+	if( t != 0 ){
+		move_sound.play()
+	}
 	if (t == 1) {
 		if (shape.j > 0 && board[shape.i][shape.j - 1] != 4) {
 			shape.j--;
@@ -534,7 +549,7 @@ function Drow_monster_point(M){ //Done
 	context.drawImage(img,M.i,M.j,40,40);
 	
 }
-function draw_dynamin_point(){
+function draw_dynamic_point(){
 	if(!eat){
 		console.log("dynamin")
 		context.beginPath();
