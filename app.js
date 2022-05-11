@@ -158,20 +158,31 @@ function create_the_board(){ //Done
 				board[i][j] = 4; //obstacle
 			} else {
 				var randomNum = Math.random();
-				if (randomNum <= (1.0 * food_remain) / cnt) {
+				if (randomNum <= (0.1 * food_remain) / cnt) {
 					food_remain--;
-					board[i][j] = 1; //Food
-				} else if (randomNum < (1.0 * (pacman_remain + food_remain)) / cnt) {
+					board[i][j] = 1; //large food
+					console.log("small")
+				} 
+				else if ((0.1 * food_remain) / cnt < randomNum && randomNum <= (0.4 * food_remain) / cnt) {
+					food_remain--;
+					board[i][j] = 11; //meduim food
+					console.log("meduim")
+				}
+				else if ( (0.4 * food_remain) / cnt < randomNum && randomNum <= (1 * food_remain) / cnt )  {
+					food_remain--;
+					board[i][j] = 111; //small food
+					console.log("larg")
+				}
+				else if (randomNum < (1 * (pacman_remain + food_remain)) / cnt) {
 					shape.i = i;
 					shape.j = j;
 					pacman_remain--;
 					board[i][j] = 2; //Pacman
+					console.log("pacman")
 				} 
-			
 				else{
 						board[i][j] = 0; //Empty
 					}
-				
 				cnt--;
 			}
 		}
@@ -226,7 +237,15 @@ function UpdatePosition_Pac() { //Done
 		}
 	}
 	if (board[shape.i][shape.j] == 1) {
-		score++;
+		score+=25;
+		eaten++;
+	}
+	if (board[shape.i][shape.j] == 11) {
+		score+=15;
+		eaten++;
+	}
+	if (board[shape.i][shape.j] == 111) {
+		score+=5;
 		eaten++;
 	}
 	if(board[shape.i][shape.j] ==6){
@@ -455,7 +474,17 @@ function Drow(x) { //Done
 			} else if (board[i][j] == 1) {
 				context.beginPath();
 				context.arc(center.x, center.y, 10, 0, 2 * Math.PI); // circle -foord
-				context.fillStyle = "black"; //color
+				context.fillStyle = 'rgb(255, 165, 65)'; //color
+				context.fill();
+			}else if (board[i][j] == 11) {
+				context.beginPath();
+				context.arc(center.x, center.y, 10, 0, 2 * Math.PI); // circle -foord
+				context.fillStyle = 'rgb(231, 227, 65)'; //color
+				context.fill();
+			}else if (board[i][j] == 111) {
+				context.beginPath();
+				context.arc(center.x, center.y, 10, 0, 2 * Math.PI); // circle -foord
+				context.fillStyle = 'rgb(148, 220, 156)'; //color
 				context.fill();
 			} else if (board[i][j] == 4) {
 				context.beginPath();
@@ -493,8 +522,7 @@ function Drow_monster_point(M){ //Done
 	var img = new Image();
 	img.src='./monster.png';
 	context.drawImage(img,M.i,M.j,40,40);
-			
-	
+
 	if(!eat){
 		context.beginPath();
 		context.fillStyle = 'rgba(2, 250, 72, 1)';
