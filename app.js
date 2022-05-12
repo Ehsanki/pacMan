@@ -32,7 +32,7 @@ var random
 var eaten = 0
 var song =new Audio('sound.mp3');
 var move_sound =new Audio('move.mp3');
-
+//test
 
 $(document).ready(function() {
 	context = canvas.getContext("2d");
