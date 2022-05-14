@@ -1,5 +1,5 @@
 var context;
-var shape = new Object();
+var shape = null
 var monster = new Object();
 var board;
 var score;
@@ -30,24 +30,54 @@ var get_clock = false
 var neighbor
 var random
 var eaten = 0
-var song =new Audio('sound.mp3');
-var move_sound =new Audio('move.mp3');
+var intro = new Audio('./sounds/intro.mp3')
+var song =new Audio('./sounds/sound.mp3');
+var move_sound =new Audio('./sounds/move.mp3');
+var lick_sound =new Audio('./sounds/lick.mp3')
+var loser_sound = new Audio('./sounds/die.mp3')
+var Winner_sound = new Audio('./sounds/win.mp3')
 //test
 
 $(document).ready(function() {
 	context = canvas.getContext("2d");
 });
+$(intro).ready(function(){
+	intro.loop=true
+	intro.play()
+})
 
 
-
+function introMusic(){
+	if (intro.paused){
+		intro.loop = true
+		intro.play()	
+	}else{
+		intro.pause()
+	}	
+}
+function backgroundMusic(){
+	if (song.paused){
+		document.getElementById("voice_img").src = "./images/music.jpg"
+		song.loop = true
+		song.play()	
+	}else{
+		document.getElementById("voice_img").src = "./images/muted.jpg"
+		song.pause()
+	}	
+}
+function lickSound(){
+	lick_sound.play()
+}
 function Start() { //Done
 
-	startMusic()
 	Get_input_values();
 	if(!ok){
 		ok=true
 		return;
 	}
+	
+	intro.pause()
+	song.play()
 	clean_the_screan();
 	show_setting();
 	create_the_board();
@@ -67,34 +97,42 @@ function Start() { //Done
 	);
 	interval = setInterval(update, 200)
 }
-
-function startMusic(){
-	song.loop = true
-	song.play()
-	
-}
-
 var ok = true
 function Get_input_values(){ //***Done  */
+	var msg = ""
+	opts=["ArrowUp","ArrowDown","ArrowRight","ArrowLeft"]
+	let up_key = document.getElementById("up").value
+	let down_key = document.getElementById("down").value
+	let right_key = document.getElementById("right").value
+	let left_key = document.getElementById("left").value
+	if( ! ( ( (up_key!=' ' && up_key.length==1) || opts.includes(up_key) ) &&
+		 ( (down_key!=' ' && down_key.length==1) || opts.includes(down_key) ) &&
+	     ( (right_key!=' ' && right_key.length==1) || opts.includes(right_key) ) &&
+	     ( (left_key != ' '&& left_key.length==1) || opts.includes(left_key) ) 
+	) ){
+		msg+="- insert an invalid key to go UP/DOWN/RIGHT/LEFT\n"
+		ok = false
+	}
 	food_remain = document.getElementById("balls").value
-	if(food_remain<50 || food_remain>90){
-		window.alert("the food must be between 50 and 90 (including)")
+	balls = document.getElementById("balls").value
+	if(food_remain<2 || food_remain>90){ //change to <50
+		msg+="- the food must be between 50 and 90 (including)\n"
 		ok =false
 	}
 	time = document.getElementById("time").value
 	if(time<2){
-		window.alert("the time must be greater than 59 secound")
+		msg+="- the time must be greater than 59 secound\n"
 		ok=false
 	}
-	
 	monsters_counter = document.getElementById("monsters").value
 	if(monsters_counter < 1 && monsters_counter>4){
-		window.alert("the number of monsters must be between 1 and 4 (including)")
+		msg+="- the number of monsters must be between 1 and 4 (including)\n"
 		ok=false
 	}
-	
+	if( msg!= ""){
+		window.alert(msg)
+	}
 }
-
 function clean_the_screan(){ //Done 
 	$( ".settings" ).css("display","none");
 	document.getElementsByTagName('body')[0].style.background = "#ffffff ";
@@ -102,21 +140,14 @@ function clean_the_screan(){ //Done
 	document.getElementById("Time").style.display = 'inline';//show the time
 	document.getElementById("score").style.display = 'inline';//show the score
 	document.getElementById("hl").style.display = 'inline' // Remained
+	document.getElementById("voice").style.display = 'inline'
 	
 
 }
-
 function show_setting(){ /**Done */
 	document.getElementById("game setting").style.display ="inline"
-	document.getElementById("U").style.display ="inline-block"
-	document.getElementById("D").style.display ="inline-block"
-	document.getElementById("R").style.display ="inline-block"
-	document.getElementById("L").style.display ="inline-block"
-	document.getElementById("B").style.display ="inline-block"
-	document.getElementById("T").style.display ="inline-block"
-	document.getElementById("M").style.display ="inline-block"
+	$(".dir").css("display","inline-block");
 	document.getElementById("hl").style.display ="inline-block"
-
 	document.getElementById("U").innerHTML = "Press " + document.getElementById("up").value + " to go up |"
 	document.getElementById("D").innerHTML = "Press " + document.getElementById("down").value + " to go down |"
 	document.getElementById("R").innerHTML = "Press " + document.getElementById("right").value + " to go right |"
@@ -126,7 +157,6 @@ function show_setting(){ /**Done */
 	document.getElementById("M").innerHTML = "Number of monsters :" + document.getElementById("monsters").value	
 	document.getElementById("hl").innerHTML = "Remained "+rejection + " attempts"
 }
-
 function create_the_board(){ //Done
 	board = new Array();
 	score = 0;
@@ -147,7 +177,6 @@ function create_the_board(){ //Done
 				monsters.push(obj)
 				board[i][j] = 5 
 				monsters_counter-=1
-				console.log(i,j)
 			}
 			else if (
 				(i == 0 && j == 0) ||(i == 0 && j == 3) ||
@@ -172,31 +201,47 @@ function create_the_board(){ //Done
 				if (randomNum <= (0.1 * food_remain) / cnt) {
 					food_remain--;
 					board[i][j] = 1; //large food
-					console.log("small")
+					
 				} 
 				else if ((0.1 * food_remain) / cnt < randomNum && randomNum <= (0.4 * food_remain) / cnt) {
 					food_remain--;
 					board[i][j] = 11; //meduim food
-					console.log("meduim")
+					
 				}
 				else if ( (0.4 * food_remain) / cnt < randomNum && randomNum <= (1 * food_remain) / cnt )  {
 					food_remain--;
 					board[i][j] = 111; //small food
-					console.log("larg")
+					
 				}
-				else if (randomNum < (1 * (pacman_remain + food_remain)) / cnt) {
+				/*else if (randomNum < (1 * (pacman_remain + food_remain)) / cnt) {
+					shape = new Object()
 					shape.i = i;
 					shape.j = j;
 					pacman_remain--;
 					board[i][j] = 2; //Pacman
-					console.log("pacman")
-				} 
+					console.log(shape.i ,shape.j)
+				} */
 				else{
 						board[i][j] = 0; //Empty
 					}
 				cnt--;
 			}
 		}
+	}
+	if (shape == null){
+		shape = new Object()
+		var emptyCell = findRandomEmptyCell(board);
+		var x = emptyCell[0]
+		var y = emptyCell[1]
+		while(  x==2 && y==1 || x==1 && y==13 || x==13 && y==1 || x==12 && y==12){
+			emptyCell = findRandomEmptyCell(board);
+			x = emptyCell[0]
+			y = emptyCell[1]
+		}
+		shape.i = x;
+		shape.j = y;
+		board[shape.i][shape.j] = 2; //Pacman
+		
 	}
 	while (food_remain > 0) {
 		var emptyCell = findRandomEmptyCell(board);
@@ -212,7 +257,6 @@ function create_the_board(){ //Done
 function update (){ //Done
 	Update_time();
 	canvas.width = canvas.width; //clean board
-
 	UpdatePosition_Pac();
 	update_dynamic_point();
 	for( i in monsters)
@@ -223,13 +267,12 @@ function update (){ //Done
 	for( i in monsters)
 	{
 		Drow_monster_point(monsters[i]);
-		draw_dynamic_point();
 	}
 	
+	draw_dynamic_point();
 	
 	show_setting();
 	game_status();
-
 }
 function Update_time(){
 	//Update Time
@@ -284,43 +327,38 @@ function UpdatePosition_Pac() { //Done
 }
 function Play_again(){
 	//Done
-	rejection=5;
-	document.getElementById("game").style.display='none'
-	document.getElementById("game setting").style.display='none'
+	eaten = 0;
+	rejection = 5;
+	$(".Game").css("display","none");
 	document.getElementById("playagain").style.display = 'block'
 	document.getElementsByTagName('body')[0].style.background = "#ffffff url('background.png')";
-	document.getElementById("game").style.display = 'none' ;//show the canvas
-	document.getElementById("Time").style.display = 'none';//show the time
-	document.getElementById("score").style.display = 'none';//show the score
-	document.getElementById("hl").style.display = 'none'
 	//document.getElementById("remain").style.display = 'none'
-	document.getElementById("U").style.display = 'none'
-	document.getElementById("U").style.display ='none'
-	document.getElementById("D").style.display ='none'
-	document.getElementById("R").style.display ='none'
-	document.getElementById("L").style.display ='none'
-	document.getElementById("B").style.display ='none'
-	document.getElementById("T").style.display ='none'
-	document.getElementById("M").style.display ='none'
+	$(".dir").css("display","none");
 	// Try to delete hl id 
 
 }
 function setting(){ //done
 	$(".settings").css("display","block");
-	
+	const inputs = document.querySelectorAll(".input")
+	inputs.forEach(input => {
+		input.value=''
+	})
 	$("#playagain").css("display","none");
-	$("#hl").css("display","none");
+	//$("#hl").css("display","none");
+	introMusic()
 	
 }
 function UpdatePosition_Monster( M){ //Done
-	if(Math.abs(M.i/40 - shape.i)<1 && Math.abs(M.j/40 - shape.j)<1){//rejection between the pacman and the monster
+	if(Math.abs(M.i/40 - shape.i)<1 && Math.abs(M.j/40 - shape.j)==0){//rejection between the pacman and the monster
 		score -=10
 		M.i = 40 ;
 		M.j = 40 ;
 		M.index = 0
-		rejection-=1
+		rejection -= 1
+		lickSound()
 	}
 	else if( (M.i % 40 == 0 && M.j % 40 == 0 && M.index==0  )  ){ // the packman moved
+		
 		context.clearRect(M.i , M.j , 40, 40)
 		M.arr = DFS(M,shape); 
 		M.x = M.arr[M.index].i
@@ -340,9 +378,9 @@ function UpdatePosition_Monster( M){ //Done
 				M.j+=10
 			}
 		M.index++
-		
 	}
-	else if(M.i % 40 == 0 && M.j % 40 == 0 && M.index < M.arr.length){ // move to cell
+	else if(M.i % 40 == 0 && M.j % 40 == 0 && M.index < M.arr.length){ // the monster moved 
+		
 		context.clearRect(M.i , M.j , 40, 40)
 		M.x = M.arr[M.index].i
 		M.y = M.arr[M.index].j
@@ -361,9 +399,8 @@ function UpdatePosition_Monster( M){ //Done
 				M.j+=10
 			}
 		M.index++
-		
 	}
-	else{ // move to cell
+	else{ // the monster is moving to cell
 		var x=M.x
 		var y=M.y
 		if(  40*x - M.i > 0 && 40*y ==M.j ){
@@ -378,11 +415,11 @@ function UpdatePosition_Monster( M){ //Done
 		else if( 40*x - M.i == 0 && 40*y > M.j ){
 			M.j+=10
 		}
-		
 	}
-	if( M.arr.length == M.index ){
+	if( M.arr.length == M.index ){ //try again to search the pacman
 		M.index=0
 	}
+	
 	
 }
 function update_dynamic_point(){ //Done update
@@ -412,26 +449,39 @@ function update_dynamic_point(){ //Done update
 
 }
 function game_status(){
+	
 	if(lblTime.value == time){
 		window.clearInterval(interval);
+		backgroundMusic()
 		if(score<100){		
 			var msg = " You arr better than " + score + " points!" 
+			loser_sound.play()
 		}
 		else{
-			var msg = " Winner!!!"
+			var msg = " Winner!!! lblTime.value == time and score>=100"
+			Winner_sound.play()
 		}
 		window.alert(msg);
+		
 		Play_again()
 	}
 	if( eaten == balls){
 		window.clearInterval(interval);
-		var msg = " Winner!!!"
+		backgroundMusic()
+		var msg = " Winner!!! eaten==balls"
+		Winner_sound.play()
 		window.alert(msg);
 		Play_again()
 	}
-	if(rejection<=0){
+	if( rejection == 0 ){
 		window.clearInterval(interval);
-		window.alert("LOSER!");
+		backgroundMusic()
+		var msg = "LOSER! rejection<=0"
+		loser_sound.play()
+		window.alert(msg);
+		
+
+		
 		Play_again()
 	}
 	else {
@@ -450,7 +500,6 @@ function game_status(){
 
 }
 function Drow(x) { //Done
-	
 	lblScore.value = score;
 	lblTime.value = time_elapsed;
 	for (var i = 0; i < 15; i++) {
@@ -523,12 +572,13 @@ function Drow(x) { //Done
 				*/
 
 			}
+
 			else if (board[i][j] == 6 ){
 				var health = new Object()
 				health.i = i 
 				health.j = j
 				var img = new Image();
-				img.src='./health.png';
+				img.src='./images/health.png';
 				context.drawImage(img,40*i,40*j,40,40);
 			}
 			else if (board[i][j] == 7 ){
@@ -536,25 +586,25 @@ function Drow(x) { //Done
 				clock.i = i 
 				clock.j = j
 				var img = new Image();
-				img.src='./clock.png';
+				img.src='./images/clock.png';
 				context.drawImage(img,40*i,40*j,40,40);
 			}
-			
 		}
-	}	
+	}
+		
 }
 function Drow_monster_point(M){ //Done
 	var img = new Image();
-	img.src='./monster.png';
+	img.src='./images/monster.png';
 	context.drawImage(img,M.i,M.j,40,40);
 	
 }
 function draw_dynamic_point(){
 	if(!eat){
-		console.log("dynamin")
-		context.beginPath();
-		context.fillStyle = 'rgba(2, 250, 72, 1)';
-		context.fillRect( dynamic_p.i*40, dynamic_p.j*40, 40, 40);
+		var food_image = new Image();
+		food_image.src='./images/food.png';
+		context.drawImage( food_image, dynamic_p.i*40, dynamic_p.j*40, 40, 40);
+		
 	}
 }
 function legal_point(i,j){ //check if (i,j) is a correct point
@@ -706,15 +756,30 @@ class Stack {
 	}
 
 }
-function myFunction(){
-	document.getElementById("up").value ="ArrowUp"
-	document.getElementById("down").value ="ArrowDown"
-	document.getElementById("right").value ="ArrowRight"
-	document.getElementById("left").value ="ArrowLeft"
-	document.getElementById("balls").value ="50"
-	document.getElementById("time").value = "60"
-	document.getElementById("monsters").value = "1"
-	balls = 50
-	time = 60
-	monsters = 1
+function random_settings(){
+	/*x=["ArrowUp","ArrowDown","ArrowRight","ArrowLeft","1","2","3","4","5","6","7","8","9","0"]
+	let random = Math.floor(Math.random() * x.length);
+	document.getElementById("up").value =x[random]
+	x.splice(random,1)
+	 random = Math.floor(Math.random() * x.length);
+	document.getElementById("down").value =x[random]
+	x.splice(random,1)
+	 random = Math.floor(Math.random() * x.length);
+	document.getElementById("right").value =x[random]
+	x.splice(random,1)
+	 random = Math.floor(Math.random() * x.length);
+	document.getElementById("left").value =x[random]
+	x.splice(random,1)
+	console.log(x)*/
+	document.getElementById("up").value ='ArrowUp'
+	document.getElementById("down").value ='ArrowDown'
+	document.getElementById("right").value ='ArrowRight'
+	document.getElementById("left").value ='ArrowLeft'
+	document.getElementById("balls").value =generateRandomIntegerInRange(50,90)
+	document.getElementById("time").value =generateRandomIntegerInRange(60,100)
+	document.getElementById("monsters").value =generateRandomIntegerInRange(1,4) 
+	
+}
+function generateRandomIntegerInRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }

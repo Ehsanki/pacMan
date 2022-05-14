@@ -3,7 +3,7 @@
 	<head>
 		<style>
 			body {
-			  background: #ffffff url('background.png');
+			  background: #ffffff url('/images/background.png');
 			  display: block;
 			  size: 50px;
 			  background-size: 1600px;
@@ -28,23 +28,26 @@
 	<body >
 	<br>
 		
-		<div id="user_name" >
+		<!-- <div id="user_name" >
 			<h3 style="color: red; ">khalil mhajne</h3>
-		  </div>
-		  <div id="score">
+		  </div> -->
+		  <div id="score" class="Game">
 			<label for="lblScore">SCORE:</label>
 			<input id="lblScore" type="text" />
 		</div>
-		<div id="Time">
+		<div id="Time" class="Game">
 			<label for="lblTime">TIME:</label>
 			<input id="lblTime" type="text" />
 		</div>
-		<div id="hl">
-			<p id="remain">
-				Remained 
+		<div id="hl" class="Game">
+			<p id="remain"> 
 			</p>
-			
 		</div>
+		<div id="voice" class="Game">
+			<img id= "voice_img" src="./images/music.jpg" alt="voice" width="20" height="20" onclick="backgroundMusic()" >
+		</div>
+			
+		
 
 		<div class="settings">
 		  <label class="font">Setting</label>
@@ -79,36 +82,29 @@
 			<input id="monsters" class = "input" type="text" />
 		</div>
 		
-		<button onclick="myFunction()" class="button">Click me to insert random values</button>
+		<button onclick="random_settings()" class="button">Random </button>
 		<button onclick="Start()" class="button" >Start</button>
 		</div>
 		<button id="playagain" onclick="setting()" class="button" style="display: none;">Play again</button>
-		
-		<div id="game" >
+		<div id="game" class="Game" >
 			<canvas id="canvas" height="600" width="600" ></canvas>
 		</div>
-		<div id="game setting" style="color:blue" >
+		<div id="game setting" class="Game" style="color:blue" >
 			<ul>
-				<li id = "U" ></li>
-				<li id = "D"></li>
-				<li id = "R"></li>
-				<li id = "L"></li>
-				<li id = "B"> </li>
-				<li id = "T"></li>
-				<li id = "M"></li>
+				<li id = "U" class ="dir"></li>
+				<li id = "D" class ="dir"></li>
+				<li id = "R" class ="dir"></li>
+				<li id = "L" class ="dir"></li>
+				<li id = "B" class ="dir"> </li>
+				<li id = "T" class ="dir"></li>
+				<li id = "M" class ="dir"></li>
 			  </ul>
 		</div>
 
-		<script> //hide 
-		document.getElementById("user_name").style.color = " #f3f3f3"  ;
-		document.getElementById("game").style.display = 'none';
-		document.getElementById("Time").style.display = 'none';
-		document.getElementById("score").style.display = 'none';
-		document.getElementById("game setting").style.display = 'none';
-		document.getElementById("hl").style.display = 'none';
-		
-		
-
+		 
+		 <!-- document.getElementById("user_name").style.color = " #f3f3f3"  ; -->
+		<script> //hide
+		$(".Game").css("display","none");
 		var down = 40
 		var right = 39
 		var up = 38
